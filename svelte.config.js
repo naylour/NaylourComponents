@@ -12,6 +12,9 @@ const config = {
         },
         alias: {
             lib: './lib'
+        },
+        output: {
+            bundleStrategy: 'single'
         }
 	},
     compilerOptions: {

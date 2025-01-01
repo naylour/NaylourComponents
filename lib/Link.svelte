@@ -1,5 +1,5 @@
 <script module lang="ts">
-    import type { Snippet } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
 	interface LinkEvent {
@@ -14,14 +14,19 @@
 		link?: HTMLAnchorElement;
 		/**
 		 * Где отображать статус активности
-		 * @type {"class" | "attr"}
 		 * @default "class"
 		 */
-		indicator?: 'class' | 'attr';
+		indicator?: 'class' | 'attr' | 'all';
 	} & HTMLAnchorAttributes;
+
+    export const LinkState = new (class {
+        count = $state(0);
+    })();
 </script>
 
 <script lang="ts">
+    LinkState.count += 1;
+
 	import { page } from '$app/state';
 
 	let {
@@ -45,7 +50,7 @@
 				} else if (page.url.pathname.startsWith(href)) isActive = true;
 				else isActive = false;
 
-				if (indicator === 'attr') attrs.active = isActive;
+				if (indicator === 'attr' || indicator == 'all') attrs.active = isActive;
 			}
 		});
 
@@ -67,9 +72,13 @@ Description Link component
 Example
 
 ```svelte
-<Link href="/admin" bind:link onactive={({ rect, currentTarget }) => {
-    console.log({ rect, currentTarget })
-}}>Admin Page</Link>
+<Link
+    href="/admin"
+    bind:link
+    onactive={({ rect, currentTarget }) => {
+        console.log({ rect, currentTarget })
+    }}
+>Admin Page</Link>
 
 ```
 -->
@@ -77,7 +86,11 @@ Example
 	{...attrs}
 	{href}
 	bind:this={link}
-	class={['link', attrs.class, indicator == 'class' && isActive && 'active']}
+	class={[
+		'link',
+		attrs.class,
+		(indicator == 'class' || indicator == 'all') && isActive && 'active'
+	]}
 >
 	{@render children?.()}
 </a>
