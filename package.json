@@ -1,6 +1,6 @@
 {
 	"name": "@naylour/components",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build && npm run package",
@@ -27,8 +27,14 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
-		}
+			"svelte": "./dist/index.js",
+			"default": "./dist/index.js"
+		},
+        "./form": {
+            "types": "./dist/Form/index.d.ts",
+			"svelte": "./dist/Form/index.js",
+			"default": "./dist/Form/index.js"
+        }
 	},
 	"peerDependencies": {
 		"svelte": "^5.0.0",

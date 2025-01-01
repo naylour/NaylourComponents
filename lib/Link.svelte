@@ -1,9 +1,5 @@
 <script module lang="ts">
-</script>
-
-<script lang="ts">
-	import { page } from '$app/state';
-	import type { Snippet } from 'svelte';
+    import type { Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 
 	interface LinkEvent {
@@ -11,13 +7,22 @@
 		currentTarget: HTMLAnchorElement;
 	}
 
-	type Props = HTMLAnchorAttributes & {
+	type Props = {
 		children: Snippet<[]>;
 		onactive?: (__event__: LinkEvent) => MaybePromise<void>;
 		isActive?: boolean;
 		link?: HTMLAnchorElement;
-        indicator?: 'class' | 'attr';
-	};
+		/**
+		 * Где отображать статус активности
+		 * @type {"class" | "attr"}
+		 * @default "class"
+		 */
+		indicator?: 'class' | 'attr';
+	} & HTMLAnchorAttributes;
+</script>
+
+<script lang="ts">
+	import { page } from '$app/state';
 
 	let {
 		children,
@@ -25,22 +30,22 @@
 		isActive = $bindable(false),
 		link = $bindable(undefined),
 		href,
-        indicator = 'class',
+		indicator = 'class',
 		...initATTRs
 	}: Props = $props();
 
-    let attrs = $state({ ...initATTRs });
+	let attrs = $state<typeof initATTRs & { active?: boolean }>({ ...initATTRs });
 
 	$effect.root(() => {
-        $effect(() => {
-            if (href) {
-                if (href === '/') {
-                    if (page.url.pathname === href) isActive = true;
+		$effect(() => {
+			if (href) {
+				if (href === '/') {
+					if (page.url.pathname === href) isActive = true;
 					else isActive = false;
 				} else if (page.url.pathname.startsWith(href)) isActive = true;
 				else isActive = false;
 
-                if(indicator === 'attr') attrs.active = isActive;
+				if (indicator === 'attr') attrs.active = isActive;
 			}
 		});
 
@@ -68,16 +73,11 @@ Example
 
 ```
 -->
-<a {...attrs} {href} bind:this={link} class={['link', attrs.class, isActive && indicator == 'class' && 'active']}>
+<a
+	{...attrs}
+	{href}
+	bind:this={link}
+	class={['link', attrs.class, indicator == 'class' && isActive && 'active']}
+>
 	{@render children?.()}
 </a>
-
-<style>
-	.link {
-		color: red;
-	}
-
-	.link.active, .link[active=true] {
-		color: blue;
-	}
-</style>
